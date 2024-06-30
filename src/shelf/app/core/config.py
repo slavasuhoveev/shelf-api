@@ -1,0 +1,10 @@
+from shelf.app.env import (
+    POSTGRES_USER,
+    POSTGRES_PASSWORD,
+    POSTGRES_HOST,
+    POSTGRES_PORT,
+    POSTGRES_DB
+)
+
+POSTGRES_URL = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}' \
+               f'@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}'

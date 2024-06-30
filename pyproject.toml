@@ -1,0 +1,106 @@
+[tool.poetry]
+name = "shelf"
+version = "0.1.0"
+description = ""
+authors = ["Slava <brainout8@gmail.com>"]
+readme = "README.md"
+
+[tool.poe.env]
+PROJECT_NAME = "shelf"
+BASE_IMAGE = "shelf"
+IMAGE = "shelf:develop"
+
+[tool.poe.tasks]
+# 1. Build Docker image
+docker-build = "docker build --target development ${DOCKER_BUILD_OPTS} -t ${IMAGE} ."
+
+# 2. Run containers using docker-compose
+up = "docker compose up -d"
+
+# 3. Stop containers
+down = "docker compose down"
+
+# 4. Runs application development on docker.
+run = [
+  "docker-build",
+  "up"
+]
+
+# 5. Make Alembic migration
+makemigrations = "docker exec ${PROJECT_NAME}_api alembic revision --autogenerate -m 'new revision'"
+
+# 6. Apply Alembic migrations
+migrate = "docker exec ${PROJECT_NAME}_api alembic upgrade head"
+
+# 7. Run tests
+test = "docker compose exec ${PROJECT_NAME}_api pytest"
+
+# 8. Show logs
+logs = "docker-compose logs -f"
+
+[tool.poetry.dependencies]
+python = "3.12.*"
+psycopg2-binary = "2.9.9"
+fastapi = "^0.115.12"
+uvicorn = "^0.34.2"
+sqlalchemy = "^2.0.41"
+asyncpg = "^0.30.0"
+pydantic = "^2.11.5"
+alembic = "^1.16.1"
+python-dotenv = "^1.1.0"
+httpx = "^0.28.1"
+
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.34.0"
+ruff = "^0.4.0"
+alembic = "^1.16.4"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    "W",
+    # Pyflakes
+    "F",
+    #mccabe
+    "C901",
+    # flake8-bugbear
+    "B",
+    # flake8-print
+    "T20",
+    # flake8-mutable
+    "B006",
+    # flake8-builtins
+    "A",
+    # flake8-pydocstyle
+    "D",
+    # flake8-async
+    "ASYNC",
+    # pep8-naming
+    "N",
+    # tryceratops
+    "TRY",
+    # flake8-bandit
+    "S",
+]
+ignore = [
+  "D203",  # Conflicts with D211
+  "D213",  # Conflicts with D212
+]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = true
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+    "classmethod",
+    "classproperty",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
