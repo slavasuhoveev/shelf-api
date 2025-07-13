@@ -1,0 +1,48 @@
+version: '3.8'
+
+x-postgres-cred: &postgres-cred
+  POSTGRES_USER: ${PROJECT_NAME}_user
+  POSTGRES_PASSWORD: ${PROJECT_NAME}
+  POSTGRES_DB: ${PROJECT_NAME}_db
+
+services:
+  postgresql:
+    image: postgres:16-alpine
+    container_name: ${PROJECT_NAME}_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data:rw
+    environment:
+      <<: *postgres-cred
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PROJECT_NAME}_user -d ${PROJECT_NAME}_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+
+  api:
+    build:
+      context: .
+    image: ${PROJECT_NAME}:develop
+    container_name: ${PROJECT_NAME}_api
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      <<: *postgres-cred
+      POSTGRES_HOST: postgresql
+      POSTGRES_PORT: 5432
+      PYTHONPATH: /app/src
+    volumes:
+      - ./src:/app/src:delegated
+      - ./alembic:/app/alembic:delegated
+      - ./alembic.ini:/app/alembic.ini:delegated
+    command: uvicorn shelf.app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    tty: true
+    stdin_open: true
+
+volumes:
+  postgres-data:
