@@ -1,3 +1,5 @@
+"""Package setup configuration for Shelf API."""
+
 import os
 
 from setuptools import setup, find_packages

@@ -1,3 +1,5 @@
+"""SQLAlchemy ORM models for Shelf domain."""
+
 from shelf.app.models.record import (
     AlbumWork, Medium, Release, UserAlbum,
 )

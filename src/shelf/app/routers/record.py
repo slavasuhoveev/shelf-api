@@ -1,3 +1,5 @@
+"""API routes for record-related endpoints."""
+
 from typing import Annotated
 
 from fastapi import (
@@ -12,19 +14,34 @@ from uuid import UUID
 
 from shelf.app.schemas import record as record_schemas
 from shelf.app.crud import record as record_crud
+from shelf.app.schemas.auth import TokenPayload
 from shelf.app.dependencies import (
     get_db,
-    get_current_user_id,
+    require_auth,
+    get_token_payload
 )
 from shelf.app.models import record as record_models
 
-# TODO: Add real user ID when auth is integrated
-DUMMY_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
-
-album_work_router = APIRouter(prefix="/album_work", tags=["Record", "Album Work"])
-release_router = APIRouter(prefix="/release", tags=["Record", "Release"])
-medium_router = APIRouter(prefix="/medium", tags=["Record", "Medium"])
-user_album_router = APIRouter(prefix="/user_album", tags=["Record", "User Album"])
+album_work_router = APIRouter(
+    prefix="api/album_work",
+    dependencies=[Depends(require_auth)],
+    tags=["Record", "Album Work"],
+)
+release_router = APIRouter(
+    prefix="api/release",
+    dependencies=[Depends(require_auth)],
+    tags=["Record", "Release"],
+)
+medium_router = APIRouter(
+    prefix="api/medium",
+    dependencies=[Depends(require_auth)],
+    tags=["Record", "Medium"],
+)
+user_album_router = APIRouter(
+    prefix="api/user_album",
+    dependencies=[Depends(require_auth)],
+    tags=["Record", "User Album"],
+)
 
 
 # Album work routs
@@ -33,6 +50,7 @@ user_album_router = APIRouter(prefix="/user_album", tags=["Record", "User Album"
 def create_album_work_route(
     album_in: record_schemas.AlbumWorkCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.AlbumWork:
     """Create a new AlbumWork.
 
@@ -40,19 +58,20 @@ def create_album_work_route(
     ----
         album_in (AlbumWorkCreate): AlbumWork data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     AlbumWork: The created AlbumWork object.
 
     """
-    return record_crud.create_album_work(db, album_in, DUMMY_USER_ID)
+    return record_crud.create_album_work(db, album_in, user["sub"])
 
 
 @album_work_router.get("/{album_id}", response_model=record_schemas.AlbumWorkRead)
 def read_album_work_route(
     album_id: UUID,
-    db: Annotated[Session, Depends(get_db)]
+    db: Annotated[Session, Depends(get_db)],
 ) -> record_models.AlbumWork:
     """Get a single AlbumWork by ID.
 
@@ -108,6 +127,7 @@ def update_album_work_route(
     album_id: UUID,
     album_in: record_schemas.AlbumWorkUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.AlbumWork:
     """Update an existing AlbumWork by ID.
 
@@ -116,6 +136,7 @@ def update_album_work_route(
         album_id (UUID): The ID of the AlbumWork to update.
         album_in (AlbumWorkUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -133,7 +154,7 @@ def update_album_work_route(
             detail="AlbumWork not found"
         )
 
-    return record_crud.update_album_work(db, db_obj, album_in, DUMMY_USER_ID)
+    return record_crud.update_album_work(db, db_obj, album_in, user["sub"])
 
 
 @album_work_router.delete("/{album_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -175,6 +196,7 @@ def delete_album_work_route(
 def create_release_route(
     release_in: record_schemas.ReleaseCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.Release:
     """Create a new Release.
 
@@ -182,13 +204,14 @@ def create_release_route(
     ----
         release_in (ReleaseCreate): Release data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     Release: The created Release object.
 
     """
-    return record_crud.create_release(db, release_in, DUMMY_USER_ID)
+    return record_crud.create_release(db, release_in, user["sub"])
 
 
 @release_router.get("/{release_id}", response_model=record_schemas.ReleaseRead)
@@ -250,6 +273,7 @@ def update_release_route(
     release_id: UUID,
     release_in: record_schemas.ReleaseUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.Release:
     """Update an existing Release by ID.
 
@@ -258,6 +282,7 @@ def update_release_route(
         release_id (UUID): The ID of the Release to update.
         release_in (ReleaseUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -275,7 +300,7 @@ def update_release_route(
             detail="Release not found"
         )
 
-    return record_crud.update_release(db, db_obj, release_in, DUMMY_USER_ID)
+    return record_crud.update_release(db, db_obj, release_in, user["sub"])
 
 
 @release_router.delete("/{release_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -317,6 +342,7 @@ def delete_release_route(
 def create_medium_route(
     medium_in: record_schemas.MediumCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.Medium:
     """Create a new Medium.
 
@@ -324,13 +350,14 @@ def create_medium_route(
     ----
         medium_in (MediumCreate): Medium data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     Medium: The created Medium object.
 
     """
-    return record_crud.create_medium(db, medium_in, DUMMY_USER_ID)
+    return record_crud.create_medium(db, medium_in, user["sub"])
 
 
 @medium_router.get("/{medium_id}", response_model=record_schemas.MediumRead)
@@ -392,6 +419,7 @@ def update_medium_route(
     medium_id: UUID,
     medium_in: record_schemas.MediumUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.Medium:
     """Update an existing Medium by ID.
 
@@ -400,6 +428,7 @@ def update_medium_route(
         medium_id (UUID): The ID of the Medium to update.
         medium_in (MediumUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -417,7 +446,7 @@ def update_medium_route(
             detail="Medium not found"
         )
 
-    return record_crud.update_medium(db, db_obj, medium_in, DUMMY_USER_ID)
+    return record_crud.update_medium(db, db_obj, medium_in, user["sub"])
 
 
 @medium_router.delete("/{medium_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -459,6 +488,7 @@ def delete_medium_route(
 def create_user_album_route(
     user_album_in: record_schemas.UserAlbumCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.UserAlbum:
     """Create a new UserAlbum.
 
@@ -466,13 +496,14 @@ def create_user_album_route(
     ----
         user_album_in (UserAlbumCreate): UserAlbum data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     UserAlbum: The created UserAlbum object.
 
     """
-    return record_crud.create_user_album(db, user_album_in, DUMMY_USER_ID)
+    return record_crud.create_user_album(db, user_album_in, user["sub"])
 
 
 @user_album_router.get("/{user_album_id}", response_model=record_schemas.UserAlbumRead)
@@ -534,6 +565,7 @@ def update_user_album_route(
     user_album_id: UUID,
     user_album_in: record_schemas.UserAlbumUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> record_models.UserAlbum:
     """Update an existing UserAlbum by ID.
 
@@ -542,6 +574,7 @@ def update_user_album_route(
         user_album_id (UUID): The ID of the UserAlbum to update.
         user_album_in (UserAlbumUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -558,7 +591,7 @@ def update_user_album_route(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="UserAlbum not found"
         )
-    return record_crud.update_user_album(db, db_obj, user_album_in, DUMMY_USER_ID)
+    return record_crud.update_user_album(db, db_obj, user_album_id, user["sub"])
 
 
 @user_album_router.delete("/{user_album_id}", status_code=status.HTTP_204_NO_CONTENT)

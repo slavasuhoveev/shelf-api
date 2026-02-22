@@ -1,3 +1,5 @@
+"""Pydantic schemas for shelf and storage endpoints."""
+
 from datetime import datetime
 from typing import Annotated, Optional
 from uuid import UUID

@@ -1,3 +1,5 @@
+"""API routes for shelf and storage endpoints."""
+
 from typing import Annotated
 
 from fastapi import (
@@ -12,18 +14,29 @@ from uuid import UUID
 
 from shelf.app.schemas import shelf as shelf_schemas
 from shelf.app.crud import shelf as shelf_crud
+from shelf.app.schemas.auth import TokenPayload
 from shelf.app.dependencies import (
     get_db,
-    get_current_user_id,
+    require_auth,
+    get_token_payload,
 )
 from shelf.app.models import shelf as shelf_models
 
-# TODO: Add real user ID when auth is integrated
-DUMMY_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
-
-storage_slot_router = APIRouter(prefix="/storage_slot", tags=["Shelf", "Storage Slot"])
-storage_item_router = APIRouter(prefix="/storage_item", tags=["Shelf", "Storage Item"])
-storage_group_router = APIRouter(prefix="/storage_group", tags=["Shelf", "Storage Group"])
+storage_slot_router = APIRouter(
+    prefix="api/storage_slot",
+    dependencies=[Depends(require_auth)],
+    tags=["Shelf", "Storage Slot"],
+)
+storage_item_router = APIRouter(
+    prefix="api/storage_item",
+    dependencies=[Depends(require_auth)],
+    tags=["Shelf", "Storage Item"],
+)
+storage_group_router = APIRouter(
+    prefix="api/storage_group",
+    dependencies=[Depends(require_auth)],
+    tags=["Shelf", "Storage Group"],
+)
 
 
 # Storage Slot routs
@@ -32,6 +45,7 @@ storage_group_router = APIRouter(prefix="/storage_group", tags=["Shelf", "Storag
 def create_storage_slot_route(
     storage_slot_in: shelf_schemas.StorageSlotCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageSlot:
     """Create a new StorageSlot.
 
@@ -39,13 +53,14 @@ def create_storage_slot_route(
     ----
         storage_slot_in (StorageSlotCreate): StorageSlot data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     StorageSlot: The created StorageSlot object.
 
     """
-    return shelf_crud.create_storage_slot(db, storage_slot_in, DUMMY_USER_ID)
+    return shelf_crud.create_storage_slot(db, storage_slot_in, user["sub"])
 
 
 @storage_slot_router.get("/{storage_slot_id}", response_model=shelf_schemas.StorageSlotRead)
@@ -107,6 +122,7 @@ def update_storage_slot_route(
     storage_slot_id: UUID,
     storage_slot_in: shelf_schemas.StorageSlotUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageSlot:
     """Update an existing StorageSlot by ID.
 
@@ -115,6 +131,7 @@ def update_storage_slot_route(
         storage_slot_id (UUID): The ID of the StorageSlot to update.
         storage_slot_in (StorageSlotUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -132,7 +149,7 @@ def update_storage_slot_route(
             detail="StorageSlot not found"
         )
 
-    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in, DUMMY_USER_ID)
+    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in, user["sub"])
 
 
 @storage_slot_router.delete("/{storage_slot_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -174,6 +191,7 @@ def delete_storage_slot_route(
 def create_storage_item_route(
     storage_item_in: shelf_schemas.StorageItemCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageItem:
     """Create a new StorageItem.
 
@@ -181,13 +199,14 @@ def create_storage_item_route(
     ----
         storage_item_in (StorageItemCreate): StorageItem data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     StorageItem: The created StorageItem object.
 
     """
-    return shelf_crud.create_storage_item(db, storage_item_in, DUMMY_USER_ID)
+    return shelf_crud.create_storage_item(db, storage_item_in, user["sub"])
 
 
 @storage_item_router.get("/{storage_item_id}", response_model=shelf_schemas.StorageItemRead)
@@ -249,6 +268,7 @@ def update_storage_item_route(
     storage_item_id: UUID,
     storage_item_in: shelf_schemas.StorageItemUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageItem:
     """Update an existing StorageItem by ID.
 
@@ -257,6 +277,7 @@ def update_storage_item_route(
         storage_item_id (UUID): The ID of the StorageItem to update.
         storage_item_in (StorageItemUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -274,7 +295,7 @@ def update_storage_item_route(
             detail="StorageItem not found"
         )
 
-    return shelf_crud.update_storage_item(db, db_obj, storage_item_in, DUMMY_USER_ID)
+    return shelf_crud.update_storage_item(db, db_obj, storage_item_in, user["sub"])
 
 
 @storage_item_router.delete("/{storage_item_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -316,6 +337,7 @@ def delete_storage_item_route(
 def create_storage_group_route(
     storage_group_in: shelf_schemas.StorageGroupCreate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageGroup:
     """Create a new StorageGroup.
 
@@ -323,13 +345,14 @@ def create_storage_group_route(
     ----
         storage_group_in (StorageGroupCreate): StorageGroup data for creation.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
     StorageGroup: The created StorageGroup object.
 
     """
-    return shelf_crud.create_storage_group(db, storage_group_in, DUMMY_USER_ID)
+    return shelf_crud.create_storage_group(db, storage_group_in, user["sub"])
 
 
 @storage_group_router.get("/{storage_group_id}", response_model=shelf_schemas.StorageGroupRead)
@@ -391,6 +414,7 @@ def update_storage_group_route(
     storage_group_id: UUID,
     storage_group_in: shelf_schemas.StorageGroupUpdate,
     db: Annotated[Session, Depends(get_db)],
+    user: Annotated[TokenPayload, Depends(get_token_payload)],
 ) -> shelf_models.StorageGroup:
     """Update an existing StorageGroup by ID.
 
@@ -399,6 +423,7 @@ def update_storage_group_route(
         storage_group_id (UUID): The ID of the StorageGroup to update.
         storage_group_in (StorageGroupUpdate): Data to update.
         db (Session): SQLAlchemy session dependency.
+        user (TokenPayload): The authenticated user information.
 
     Returns:
     -------
@@ -416,7 +441,7 @@ def update_storage_group_route(
             detail="StorageGroup not found"
         )
 
-    return shelf_crud.update_storage_group(db, db_obj, storage_group_in, DUMMY_USER_ID)
+    return shelf_crud.update_storage_group(db, db_obj, storage_group_in, user["sub"])
 
 
 @storage_group_router.delete("/{storage_group_id}", status_code=status.HTTP_204_NO_CONTENT)

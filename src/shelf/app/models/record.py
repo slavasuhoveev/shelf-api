@@ -1,3 +1,8 @@
+"""ORM models for record-related entities.
+
+Defines AlbumWork, Release, and related database structures.
+"""
+
 import uuid
 from typing import Optional
 
@@ -10,6 +15,8 @@ from shelf.app.enums.record import (
     RecordGrade,
     SleeveGrade,
 )
+
+from shelf.app.models.shelf import StorageSlot
 
 from shelf.app.models.base import BaseModel
 
@@ -221,7 +228,7 @@ class UserAlbum(BaseModel):
 
     medium = relationship("Medium", back_populates="user_albums", lazy="selectin")
 
-    storage_slot: Mapped["StorageSlot"] = relationship(
+    storage_slot: Mapped[StorageSlot] = relationship(
         back_populates="user_album",
         uselist=False,
         cascade="all, delete-orphan",

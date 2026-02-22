@@ -34,6 +34,10 @@ services:
       POSTGRES_HOST: postgresql
       POSTGRES_PORT: 5432
       PYTHONPATH: /app/src
+      AUTH_JWKS_URL: http://shelf_auth:8081/.well-known/jwks.json
+      JWT_ISSUER: ${PROJECT_NAME}-auth
+      JWT_AUDIENCE: ${PROJECT_NAME}
+      JWKS_CACHE_TTL_SECONDS: 300
     volumes:
       - ./src:/app/src:delegated
       - ./alembic:/app/alembic:delegated

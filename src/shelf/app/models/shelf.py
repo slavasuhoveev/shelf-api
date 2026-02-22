@@ -1,3 +1,5 @@
+"""ORM models for shelf and storage entities."""
+
 import uuid
 from typing import Optional
 

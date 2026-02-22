@@ -1,4 +1,17 @@
+"""Shelf API application entry point.
+
+Initializes FastAPI app, routers, and middleware.
+"""
+
 from fastapi import FastAPI
+
+from shelf.app.routers.system import (
+    system_group_router
+)
+
+from shelf.app.routers.user import (
+    user_router
+)
 
 from shelf.app.routers.record import (
     album_work_router,
@@ -13,6 +26,12 @@ from shelf.app.routers.shelf import (
 )
 
 app = FastAPI()
+
+# System routs
+app.include_router(system_group_router)
+
+# User routs
+app.include_router(user_router)
 
 # Record routs
 app.include_router(album_work_router)

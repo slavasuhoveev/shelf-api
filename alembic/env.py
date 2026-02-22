@@ -1,3 +1,10 @@
+"""Alembic environment configuration.
+
+Configures database connection and metadata for migrations.
+Responsible for loading application models and running
+offline/online migration contexts.
+"""
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -5,16 +12,15 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from shelf.app.core.config import POSTGRES_URL
+from shelf.app.core.config import settings
 from shelf.app.models.base import Base
-from shelf.app.models import *
 
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", POSTGRES_URL)
+config.set_main_option("sqlalchemy.url", settings.postgres_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

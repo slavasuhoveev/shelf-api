@@ -1,3 +1,8 @@
+"""Base SQLAlchemy model definitions.
+
+Contains shared fields and declarative base configuration.
+"""
+
 from datetime import datetime
 
 from sqlalchemy import func
