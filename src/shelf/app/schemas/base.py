@@ -1,3 +1,8 @@
+"""Base Pydantic schema configuration.
+
+Provides shared configuration and common schema utilities.
+"""
+
 from pydantic import BaseModel, ConfigDict
 
 

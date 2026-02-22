@@ -1,3 +1,5 @@
+"""CRUD operations for shelf and storage models."""
+
 from sqlalchemy.orm import Session
 from shelf.app.models.shelf import (
     StorageSlot,

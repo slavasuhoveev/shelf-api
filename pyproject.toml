@@ -38,6 +38,22 @@ test = "docker compose exec ${PROJECT_NAME}_api pytest"
 # 8. Show logs
 logs = "docker-compose logs -f"
 
+# 9. Run Ruff linter
+lint = "ruff check ."
+
+# 10. Run Ruff with auto-fix
+lint-fix = "ruff check . --fix"
+
+# 11. Run Ruff formatter
+format = "ruff format ."
+
+# 12. Run full quality check
+check = [
+  "lint",
+  "format"
+]
+
+
 [tool.poetry.dependencies]
 python = "3.12.*"
 psycopg2-binary = "2.9.9"
@@ -49,6 +65,8 @@ pydantic = "^2.11.5"
 alembic = "^1.16.1"
 python-dotenv = "^1.1.0"
 httpx = "^0.28.1"
+pydantic-settings = "^2.13.1"
+python-jose = {extras = ["cryptography"], version = "^3.5.0"}
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.34.0"

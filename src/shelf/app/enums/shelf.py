@@ -1,3 +1,5 @@
+"""Enumerations for shelf and storage-related entities."""
+
 from enum import Enum
 
 class StorageType(str, Enum):

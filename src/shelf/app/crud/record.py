@@ -1,3 +1,9 @@
+"""CRUD operations for record-related models.
+
+Includes creation, update, deletion, and retrieval
+logic for album works and releases.
+"""
+
 from sqlalchemy.orm import Session
 from shelf.app.models.record import (
     AlbumWork,

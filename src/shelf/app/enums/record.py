@@ -1,3 +1,5 @@
+"""Enumerations for record-related entities."""
+
 from enum import Enum
 
 

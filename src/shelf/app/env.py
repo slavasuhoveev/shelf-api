@@ -1,3 +1,9 @@
+"""Environment variable access layer.
+
+Provides configuration values loaded from
+OS environment variables.
+"""
+
 import os
 
 POSTGRES_USER = os.environ.get('POSTGRES_USER', 'shelf_user')
