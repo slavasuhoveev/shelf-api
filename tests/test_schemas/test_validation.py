@@ -2,110 +2,35 @@ import pytest
 from pydantic import ValidationError
 from uuid import uuid4
 
-from shelf.app.schemas.record import (
-    AlbumWorkCreate,
-    ReleaseCreate,
-    MediumCreate,
-    UserAlbumCreate,
-)
-from shelf.app.schemas.shelf import (
-    StorageSlotCreate,
-    StorageItemCreate,
-    StorageGroupCreate,
-)
 from shelf.app.enums.record import MediumFormat
 from shelf.app.enums.shelf import StorageType
+from shelf.app.schemas.record import AlbumWorkCreate, MediumCreate, ReleaseCreate, UserAlbumCreate
+from shelf.app.schemas.shelf import StorageGroupCreate, StorageItemCreate, StorageSlotCreate
 
-valid_album = {
-    'title': 't',
-    'artist': 'a',
-    'year_composed': 2000,
-    'genre': 'g',
-    'style': 's',
-    'tracks': ['t1'],
-}
-
-invalid_album = {**valid_album, 'year_composed': 1800}
-
-valid_release = {
-    'album_work_id': uuid4(),
-    'label': 'l',
-    'country': 'c',
-    'year': 2000,
-    'tracklist': ['a'],
-    'notes': None,
-}
-
-invalid_release = {**valid_release, 'year': 1800}
-
-valid_medium = {
-    'release_id': uuid4(),
-    'format': MediumFormat.VINYL,
-    'medium_count': 1,
-    'sides': [{}],
-    'color_hint': 'red',
-}
-
-invalid_medium = {**valid_medium, 'medium_count': 0}
-
-valid_user_album = {
-    'medium_id': uuid4(),
-}
-
-invalid_user_album = {**valid_user_album, 'vinyl_grade': 'BAD'}
-
-valid_slot = {
-    'storage_item_id': uuid4(),
-    'user_album_id': uuid4(),
-    'position': {},
-    'capacity': 1,
-}
-
-invalid_slot = {**valid_slot, 'capacity': 0}
-
-valid_item = {
-    'group_id': uuid4(),
-    'title': 'i',
-    'description': 'd',
-    'is_public': False,
-    'storage_type': StorageType.SHELF,
-    'form_vector': {},
-    'position_vector': None,
-}
-
-invalid_item = {**valid_item, 'storage_type': 'invalid'}
-
-valid_group = {
-    'title': 'g',
-    'description': 'd',
-    'is_public': False,
-}
-
-invalid_group = {**valid_group, 'title': ''}
 
 @pytest.mark.parametrize(
-    'schema,data,should_fail',
+    ('schema_cls', 'payload', 'expect_error'),
     [
-        (AlbumWorkCreate, valid_album, False),
-        pytest.param(AlbumWorkCreate, invalid_album, True, id='album_invalid'),
-        (ReleaseCreate, valid_release, False),
-        pytest.param(ReleaseCreate, invalid_release, True, id='release_invalid'),
-        (MediumCreate, valid_medium, False),
-        pytest.param(MediumCreate, invalid_medium, True, id='medium_invalid'),
-        (UserAlbumCreate, valid_user_album, False),
-        pytest.param(UserAlbumCreate, invalid_user_album, True, id='user_album_invalid'),
-        (StorageSlotCreate, valid_slot, False),
-        pytest.param(StorageSlotCreate, invalid_slot, True, id='slot_invalid'),
-        (StorageItemCreate, valid_item, False),
-        pytest.param(StorageItemCreate, invalid_item, True, id='item_invalid'),
-        (StorageGroupCreate, valid_group, False),
-        pytest.param(StorageGroupCreate, invalid_group, True, id='group_invalid'),
-    ]
+        pytest.param(AlbumWorkCreate, {'title': 'A', 'artist': 'B', 'year_composed': 1990, 'genre': 'Rock', 'style': 'Alt', 'tracks': ['T1']}, False, id='album_work-valid'),
+        pytest.param(AlbumWorkCreate, {'title': 'A', 'artist': 'B', 'year_composed': 1800, 'genre': 'Rock', 'style': 'Alt', 'tracks': ['T1']}, True, id='album_work-invalid-year'),
+        pytest.param(ReleaseCreate, {'album_work_id': uuid4(), 'label': 'L', 'country': 'US', 'year': 1990, 'tracklist': ['T1'], 'notes': None}, False, id='release-valid'),
+        pytest.param(ReleaseCreate, {'album_work_id': uuid4(), 'label': 'L', 'country': 'US', 'year': 2200, 'tracklist': ['T1'], 'notes': None}, True, id='release-invalid-year'),
+        pytest.param(MediumCreate, {'release_id': uuid4(), 'format': MediumFormat.VINYL, 'medium_count': 1, 'sides': [{}], 'color_hint': 'black'}, False, id='medium-valid'),
+        pytest.param(MediumCreate, {'release_id': uuid4(), 'format': MediumFormat.VINYL, 'medium_count': 0, 'sides': [{}], 'color_hint': 'black'}, True, id='medium-invalid-count'),
+        pytest.param(UserAlbumCreate, {'medium_id': uuid4(), 'is_shared': False}, False, id='user_album-valid'),
+        pytest.param(UserAlbumCreate, {'medium_id': uuid4(), 'vinyl_grade': 'BAD'}, True, id='user_album-invalid-grade'),
+        pytest.param(StorageGroupCreate, {'title': 'Living room', 'description': 'Main', 'is_public': False}, False, id='storage_group-valid'),
+        pytest.param(StorageGroupCreate, {'description': 'Main', 'is_public': False}, True, id='storage_group-missing-title'),
+        pytest.param(StorageItemCreate, {'group_id': uuid4(), 'title': 'Shelf', 'description': 'desc', 'storage_type': StorageType.SHELF, 'form_vector': {}, 'position_vector': None}, False, id='storage_item-valid'),
+        pytest.param(StorageItemCreate, {'group_id': uuid4(), 'title': 'Shelf', 'description': 'desc', 'storage_type': 'WRONG', 'form_vector': {}, 'position_vector': None}, True, id='storage_item-invalid-type'),
+        pytest.param(StorageSlotCreate, {'storage_item_id': uuid4(), 'user_album_id': uuid4(), 'position': {}, 'capacity': 1}, False, id='storage_slot-valid'),
+        pytest.param(StorageSlotCreate, {'storage_item_id': uuid4(), 'user_album_id': uuid4(), 'position': {}, 'capacity': 0}, True, id='storage_slot-invalid-capacity'),
+    ],
 )
-def test_schema_validation(schema, data, should_fail):
-    if should_fail:
+def test_schema_validation_with_valid_and_invalid_data(schema_cls, payload, expect_error):
+    if expect_error:
         with pytest.raises(ValidationError):
-            schema(**data)
+            schema_cls(**payload)
     else:
-        obj = schema(**data)
-        assert obj
+        model = schema_cls(**payload)
+        assert model
