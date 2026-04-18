@@ -23,30 +23,30 @@ from shelf.app.dependencies import (
 from shelf.app.models import record as record_models
 
 album_work_router = APIRouter(
-    prefix="api/album_work",
+    prefix="/api/album-works",
     dependencies=[Depends(require_auth)],
     tags=["Record", "Album Work"],
 )
 release_router = APIRouter(
-    prefix="api/release",
+    prefix="/api/releases",
     dependencies=[Depends(require_auth)],
     tags=["Record", "Release"],
 )
 medium_router = APIRouter(
-    prefix="api/medium",
+    prefix="/api/mediums",
     dependencies=[Depends(require_auth)],
     tags=["Record", "Medium"],
 )
 user_album_router = APIRouter(
-    prefix="api/user_album",
+    prefix="/api/user-albums",
     dependencies=[Depends(require_auth)],
     tags=["Record", "User Album"],
 )
 
 
-# Album work routs
+# Album work routes
 
-@album_work_router.post("/", response_model=record_schemas.AlbumWorkRead)
+@album_work_router.post("", response_model=record_schemas.AlbumWorkRead)
 def create_album_work_route(
     album_in: record_schemas.AlbumWorkCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -65,7 +65,7 @@ def create_album_work_route(
     AlbumWork: The created AlbumWork object.
 
     """
-    return record_crud.create_album_work(db, album_in, user["sub"])
+    return record_crud.create_album_work(db, album_in, user.sub)
 
 
 @album_work_router.get("/{album_id}", response_model=record_schemas.AlbumWorkRead)
@@ -98,7 +98,7 @@ def read_album_work_route(
     return album
 
 
-@album_work_router.get("/", response_model=list[record_schemas.AlbumWorkRead])
+@album_work_router.get("", response_model=list[record_schemas.AlbumWorkRead])
 def read_album_works_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -147,6 +147,12 @@ def update_album_work_route(
     HTTPException: If the AlbumWork is not found.
 
     """
+    print('')
+    print('')
+    print('album_id', album_id)
+    print('')
+    print('')
+
     db_obj = record_crud.get_album_work(db, album_id)
     if not db_obj:
         raise HTTPException(
@@ -154,7 +160,7 @@ def update_album_work_route(
             detail="AlbumWork not found"
         )
 
-    return record_crud.update_album_work(db, db_obj, album_in, user["sub"])
+    return record_crud.update_album_work(db, db_obj, album_in, user.sub)
 
 
 @album_work_router.delete("/{album_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -192,7 +198,7 @@ def delete_album_work_route(
 
 # Release routes
 
-@release_router.post("/", response_model=record_schemas.ReleaseRead)
+@release_router.post("", response_model=record_schemas.ReleaseRead)
 def create_release_route(
     release_in: record_schemas.ReleaseCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -211,7 +217,7 @@ def create_release_route(
     Release: The created Release object.
 
     """
-    return record_crud.create_release(db, release_in, user["sub"])
+    return record_crud.create_release(db, release_in, user.sub)
 
 
 @release_router.get("/{release_id}", response_model=record_schemas.ReleaseRead)
@@ -244,7 +250,7 @@ def read_release_route(
     return release
 
 
-@release_router.get("/", response_model=list[record_schemas.ReleaseRead])
+@release_router.get("", response_model=list[record_schemas.ReleaseRead])
 def read_releases_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -300,7 +306,7 @@ def update_release_route(
             detail="Release not found"
         )
 
-    return record_crud.update_release(db, db_obj, release_in, user["sub"])
+    return record_crud.update_release(db, db_obj, release_in, user.sub)
 
 
 @release_router.delete("/{release_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -338,7 +344,7 @@ def delete_release_route(
 
 # Medium routes
 
-@medium_router.post("/", response_model=record_schemas.MediumRead)
+@medium_router.post("", response_model=record_schemas.MediumRead)
 def create_medium_route(
     medium_in: record_schemas.MediumCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -357,7 +363,7 @@ def create_medium_route(
     Medium: The created Medium object.
 
     """
-    return record_crud.create_medium(db, medium_in, user["sub"])
+    return record_crud.create_medium(db, medium_in, user.sub)
 
 
 @medium_router.get("/{medium_id}", response_model=record_schemas.MediumRead)
@@ -390,7 +396,7 @@ def read_medium_route(
     return medium
 
 
-@medium_router.get("/", response_model=list[record_schemas.MediumRead])
+@medium_router.get("", response_model=list[record_schemas.MediumRead])
 def read_mediums_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -413,8 +419,8 @@ def read_mediums_route(
 
 
 @medium_router.patch("/{medium_id}",
-                      response_model=record_schemas.MediumRead,
-                      response_model_exclude_unset=True)
+                     response_model=record_schemas.MediumRead,
+                     response_model_exclude_unset=True)
 def update_medium_route(
     medium_id: UUID,
     medium_in: record_schemas.MediumUpdate,
@@ -446,7 +452,7 @@ def update_medium_route(
             detail="Medium not found"
         )
 
-    return record_crud.update_medium(db, db_obj, medium_in, user["sub"])
+    return record_crud.update_medium(db, db_obj, medium_in, user.sub)
 
 
 @medium_router.delete("/{medium_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -484,7 +490,7 @@ def delete_medium_route(
 
 # UserAlbum routes
 
-@user_album_router.post("/", response_model=record_schemas.UserAlbumRead)
+@user_album_router.post("", response_model=record_schemas.UserAlbumRead)
 def create_user_album_route(
     user_album_in: record_schemas.UserAlbumCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -503,7 +509,7 @@ def create_user_album_route(
     UserAlbum: The created UserAlbum object.
 
     """
-    return record_crud.create_user_album(db, user_album_in, user["sub"])
+    return record_crud.create_user_album(db, user_album_in, user.sub)
 
 
 @user_album_router.get("/{user_album_id}", response_model=record_schemas.UserAlbumRead)
@@ -536,7 +542,7 @@ def read_user_album_route(
     return user_album
 
 
-@user_album_router.get("/", response_model=list[record_schemas.UserAlbumRead])
+@user_album_router.get("", response_model=list[record_schemas.UserAlbumRead])
 def read_user_albums_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -559,8 +565,8 @@ def read_user_albums_route(
 
 
 @user_album_router.patch("/{user_album_id}",
-                      response_model=record_schemas.UserAlbumRead,
-                      response_model_exclude_unset=True)
+                         response_model=record_schemas.UserAlbumRead,
+                         response_model_exclude_unset=True)
 def update_user_album_route(
     user_album_id: UUID,
     user_album_in: record_schemas.UserAlbumUpdate,
@@ -591,7 +597,7 @@ def update_user_album_route(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="UserAlbum not found"
         )
-    return record_crud.update_user_album(db, db_obj, user_album_id, user["sub"])
+    return record_crud.update_user_album(db, db_obj, user_album_id, user.sub)
 
 
 @user_album_router.delete("/{user_album_id}", status_code=status.HTTP_204_NO_CONTENT)

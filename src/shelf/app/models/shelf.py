@@ -15,7 +15,7 @@ from shelf.app.enums.shelf import StorageType
 
 
 class StorageSlot(BaseModel):
-    """Represents a user-defined storage slot for medium.
+    """Represents a user-defined storage slot for user album.
 
     Fields:
         id: Unique group identifier (UUID).
@@ -33,7 +33,7 @@ class StorageSlot(BaseModel):
     storage_item_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("storage_items.id"),
                                                                   nullable=False)
     user_album_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user_albums.id"), nullable=False, unique=True
+        ForeignKey("user_albums.id"), nullable=True, unique=True
     )
     position: Mapped[dict] = mapped_column(JSON, nullable=False)
     capacity: Mapped[int] = mapped_column(server_default="1", nullable=False)
@@ -44,7 +44,7 @@ class StorageSlot(BaseModel):
         back_populates="storage_slot",
         lazy="selectin",
         uselist=False,
-        cascade="all, delete-orphan"
+        foreign_keys=[user_album_id],
     )
 
     def __repr__(self) -> str:
@@ -87,7 +87,9 @@ class StorageItem(BaseModel):
     form_vector: Mapped[dict] = mapped_column(JSON, nullable=False)
     position_vector: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
-    group = relationship("StorageGroup", back_populates="storage_items", lazy="selectin")
+    storage_group: Mapped[Optional["StorageGroup"]] = relationship("StorageGroup",
+                                                                   back_populates="storage_items",
+                                                                   lazy="selectin")
 
     storage_slots: Mapped[list["StorageSlot"]] = relationship(
         back_populates="storage_item",
@@ -109,6 +111,7 @@ class StorageGroup(BaseModel):
         title: Title of the group.
         description: Description of the group.
         is_public: Whether this group is publicly visible to others.
+        storage_items: List of storage items in this group.
     """
 
     __tablename__ = "storage_groups"
