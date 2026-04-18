@@ -23,17 +23,17 @@ from shelf.app.dependencies import (
 from shelf.app.models import shelf as shelf_models
 
 storage_slot_router = APIRouter(
-    prefix="api/storage_slot",
+    prefix="/api/storage_slot",
     dependencies=[Depends(require_auth)],
     tags=["Shelf", "Storage Slot"],
 )
 storage_item_router = APIRouter(
-    prefix="api/storage_item",
+    prefix="/api/storage_item",
     dependencies=[Depends(require_auth)],
     tags=["Shelf", "Storage Item"],
 )
 storage_group_router = APIRouter(
-    prefix="api/storage_group",
+    prefix="/api/storage_group",
     dependencies=[Depends(require_auth)],
     tags=["Shelf", "Storage Group"],
 )
@@ -41,7 +41,7 @@ storage_group_router = APIRouter(
 
 # Storage Slot routs
 
-@storage_slot_router.post("/", response_model=shelf_schemas.StorageSlotRead)
+@storage_slot_router.post("", response_model=shelf_schemas.StorageSlotRead)
 def create_storage_slot_route(
     storage_slot_in: shelf_schemas.StorageSlotCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -60,7 +60,7 @@ def create_storage_slot_route(
     StorageSlot: The created StorageSlot object.
 
     """
-    return shelf_crud.create_storage_slot(db, storage_slot_in, user["sub"])
+    return shelf_crud.create_storage_slot(db, storage_slot_in, user.sub)
 
 
 @storage_slot_router.get("/{storage_slot_id}", response_model=shelf_schemas.StorageSlotRead)
@@ -93,7 +93,7 @@ def read_storage_slot_route(
     return storage_slot
 
 
-@storage_slot_router.get("/", response_model=list[shelf_schemas.StorageSlotRead])
+@storage_slot_router.get("", response_model=list[shelf_schemas.StorageSlotRead])
 def read_storage_slots_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -116,8 +116,8 @@ def read_storage_slots_route(
 
 
 @storage_slot_router.patch("/{storage_slot_id}",
-                         response_model=shelf_schemas.StorageSlotRead,
-                         response_model_exclude_unset=True)
+                           response_model=shelf_schemas.StorageSlotRead,
+                           response_model_exclude_unset=True)
 def update_storage_slot_route(
     storage_slot_id: UUID,
     storage_slot_in: shelf_schemas.StorageSlotUpdate,
@@ -149,7 +149,7 @@ def update_storage_slot_route(
             detail="StorageSlot not found"
         )
 
-    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in, user["sub"])
+    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in, user.sub)
 
 
 @storage_slot_router.delete("/{storage_slot_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -187,7 +187,7 @@ def delete_storage_slot_route(
 
 # Storage Item routs
 
-@storage_item_router.post("/", response_model=shelf_schemas.StorageItemRead)
+@storage_item_router.post("", response_model=shelf_schemas.StorageItemRead)
 def create_storage_item_route(
     storage_item_in: shelf_schemas.StorageItemCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -206,7 +206,7 @@ def create_storage_item_route(
     StorageItem: The created StorageItem object.
 
     """
-    return shelf_crud.create_storage_item(db, storage_item_in, user["sub"])
+    return shelf_crud.create_storage_item(db, storage_item_in, user.sub)
 
 
 @storage_item_router.get("/{storage_item_id}", response_model=shelf_schemas.StorageItemRead)
@@ -239,7 +239,7 @@ def read_storage_item_route(
     return album
 
 
-@storage_item_router.get("/", response_model=list[shelf_schemas.StorageItemRead])
+@storage_item_router.get("", response_model=list[shelf_schemas.StorageItemRead])
 def read_storage_items_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -262,8 +262,8 @@ def read_storage_items_route(
 
 
 @storage_item_router.patch("/{storage_item_id}",
-                         response_model=shelf_schemas.StorageItemRead,
-                         response_model_exclude_unset=True)
+                           response_model=shelf_schemas.StorageItemRead,
+                           response_model_exclude_unset=True)
 def update_storage_item_route(
     storage_item_id: UUID,
     storage_item_in: shelf_schemas.StorageItemUpdate,
@@ -295,7 +295,7 @@ def update_storage_item_route(
             detail="StorageItem not found"
         )
 
-    return shelf_crud.update_storage_item(db, db_obj, storage_item_in, user["sub"])
+    return shelf_crud.update_storage_item(db, db_obj, storage_item_in, user.sub)
 
 
 @storage_item_router.delete("/{storage_item_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -333,7 +333,7 @@ def delete_storage_item_route(
 
 # Storage Group routs
 
-@storage_group_router.post("/", response_model=shelf_schemas.StorageGroupRead)
+@storage_group_router.post("", response_model=shelf_schemas.StorageGroupRead)
 def create_storage_group_route(
     storage_group_in: shelf_schemas.StorageGroupCreate,
     db: Annotated[Session, Depends(get_db)],
@@ -352,7 +352,7 @@ def create_storage_group_route(
     StorageGroup: The created StorageGroup object.
 
     """
-    return shelf_crud.create_storage_group(db, storage_group_in, user["sub"])
+    return shelf_crud.create_storage_group(db, storage_group_in, user.sub)
 
 
 @storage_group_router.get("/{storage_group_id}", response_model=shelf_schemas.StorageGroupRead)
@@ -385,7 +385,7 @@ def read_storage_group_route(
     return storage_group
 
 
-@storage_group_router.get("/", response_model=list[shelf_schemas.StorageGroupRead])
+@storage_group_router.get("", response_model=list[shelf_schemas.StorageGroupRead])
 def read_storage_groups_route(
     db: Annotated[Session, Depends(get_db)],
     skip: int = 0,
@@ -408,8 +408,8 @@ def read_storage_groups_route(
 
 
 @storage_group_router.patch("/{storage_group_id}",
-                         response_model=shelf_schemas.StorageGroupRead,
-                         response_model_exclude_unset=True)
+                            response_model=shelf_schemas.StorageGroupRead,
+                            response_model_exclude_unset=True)
 def update_storage_group_route(
     storage_group_id: UUID,
     storage_group_in: shelf_schemas.StorageGroupUpdate,
@@ -441,7 +441,7 @@ def update_storage_group_route(
             detail="StorageGroup not found"
         )
 
-    return shelf_crud.update_storage_group(db, db_obj, storage_group_in, user["sub"])
+    return shelf_crud.update_storage_group(db, db_obj, storage_group_in, user.sub)
 
 
 @storage_group_router.delete("/{storage_group_id}", status_code=status.HTTP_204_NO_CONTENT)

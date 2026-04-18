@@ -176,7 +176,7 @@ class Medium(BaseModel):
 
     release = relationship("Release", back_populates="mediums", lazy="selectin")
 
-    users_albums: Mapped[list["UserAlbum"]] = relationship(
+    user_albums: Mapped[list["UserAlbum"]] = relationship(
         back_populates="medium",
         cascade="all, delete-orphan",
         lazy="selectin"
@@ -212,8 +212,6 @@ class UserAlbum(BaseModel):
     )
     medium_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("mediums.id"),
                                                   nullable=False)
-    slot_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("storage_slots.id"),
-                                                         nullable=True)
     custom_notes: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     custom_cover: Mapped[Optional[str]] = mapped_column(nullable=True)
     vinyl_grade: Mapped[Optional[RecordGrade]] = mapped_column(
@@ -228,13 +226,12 @@ class UserAlbum(BaseModel):
 
     medium = relationship("Medium", back_populates="user_albums", lazy="selectin")
 
-    storage_slot: Mapped[StorageSlot] = relationship(
+    storage_slot: Mapped[Optional[StorageSlot]] = relationship(
+        StorageSlot,
         back_populates="user_album",
         uselist=False,
-        cascade="all, delete-orphan",
-        lazy="selectin"
     )
 
     def __repr__(self) -> str:
         """UserAlbum representation string."""
-        return f"User album {self.id} of medium {self.medium.id}"
+        return f"User album {self.id} of medium {self.medium_id}"

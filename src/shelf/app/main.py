@@ -4,6 +4,7 @@ Initializes FastAPI app, routers, and middleware.
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from shelf.app.routers.system import (
     system_group_router
@@ -26,6 +27,15 @@ from shelf.app.routers.shelf import (
 )
 
 app = FastAPI()
+
+# Configure CORS middleware to allow requests from the frontend application
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # System routs
 app.include_router(system_group_router)

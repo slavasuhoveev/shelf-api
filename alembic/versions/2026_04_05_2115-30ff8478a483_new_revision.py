@@ -1,8 +1,7 @@
 """New revision.
 
-Revision ID: a5cd7b386dc8
-Revises:
-Create Date: 2025-07-13 09:01:36.196979
+Revision ID: 30ff8478a483
+Create Date: 2026-04-05 21:15:11.481204
 
 """
 from typing import Sequence, Union
@@ -12,7 +11,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a5cd7b386dc8'
+revision: str = '30ff8478a483'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,7 +37,6 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-
     op.create_index(op.f('ix_album_works_artist'), 'album_works', ['artist'], unique=False)
     op.create_index(op.f('ix_album_works_created_by'), 'album_works', ['created_by'], unique=False)
     op.create_index(op.f('ix_album_works_genre'), 'album_works', ['genre'], unique=False)
@@ -56,37 +54,6 @@ def upgrade() -> None:
     sa.Column('is_public', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('storage_slots',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('storage_item_id', sa.UUID(), nullable=False),
-    sa.Column('user_album_id', sa.UUID(), nullable=False),
-    sa.Column('position', sa.JSON(), nullable=False),
-    sa.Column('capacity', sa.Integer(), server_default='1', nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['storage_item_id'], ['storage_items.id'], ),
-    sa.ForeignKeyConstraint(['user_album_id'], ['user_albums.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_album_id')
-    )
-    op.create_table('user_albums',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('user_id', sa.UUID(), nullable=False),
-    sa.Column('medium_id', sa.UUID(), nullable=False),
-    sa.Column('slot_id', sa.UUID(), nullable=True),
-    sa.Column('custom_notes', sa.String(length=500), nullable=True),
-    sa.Column('custom_cover', sa.String(), nullable=True),
-    sa.Column('vinyl_grade', sa.Enum('M', 'NM', 'VG_PLUS', 'VG', 'G_PLUS', 'G', 'F', 'P',
-                                     name='vinyl_grade'), nullable=True),
-    sa.Column('sleeve_grade', sa.Enum('SS', 'M', 'NM', 'VG_PLUS', 'VG', 'G_PLUS', 'G', 'F', 'P',
-                                      name='sleeve_grade'), nullable=True),
-    sa.Column('is_shared', sa.Boolean(), server_default='false', nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['medium_id'], ['mediums.id'], ),
-    sa.ForeignKeyConstraint(['slot_id'], ['storage_slots.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('releases',
@@ -149,12 +116,43 @@ def upgrade() -> None:
     op.create_index(op.f('ix_mediums_is_public'), 'mediums', ['is_public'], unique=False)
     op.create_index(op.f('ix_mediums_is_verified'), 'mediums', ['is_verified'], unique=False)
     op.create_index(op.f('ix_mediums_updated_by'), 'mediums', ['updated_by'], unique=False)
+    op.create_table('user_albums',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
+    sa.Column('medium_id', sa.UUID(), nullable=False),
+    sa.Column('custom_notes', sa.String(length=500), nullable=True),
+    sa.Column('custom_cover', sa.String(), nullable=True),
+    sa.Column('vinyl_grade', sa.Enum('M', 'NM', 'VG_PLUS', 'VG', 'G_PLUS', 'G', 'F', 'P', name='vinyl_grade'),
+              nullable=True),
+    sa.Column('sleeve_grade', sa.Enum('SS', 'M', 'NM', 'VG_PLUS', 'VG', 'G_PLUS', 'G', 'F', 'P', name='sleeve_grade'),
+              nullable=True),
+    sa.Column('is_shared', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['medium_id'], ['mediums.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('storage_slots',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('storage_item_id', sa.UUID(), nullable=False),
+    sa.Column('user_album_id', sa.UUID(), nullable=True),
+    sa.Column('position', sa.JSON(), nullable=False),
+    sa.Column('capacity', sa.Integer(), server_default='1', nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['storage_item_id'], ['storage_items.id'], ),
+    sa.ForeignKeyConstraint(['user_album_id'], ['user_albums.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_album_id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('storage_slots')
+    op.drop_table('user_albums')
     op.drop_index(op.f('ix_mediums_updated_by'), table_name='mediums')
     op.drop_index(op.f('ix_mediums_is_verified'), table_name='mediums')
     op.drop_index(op.f('ix_mediums_is_public'), table_name='mediums')
@@ -169,8 +167,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_releases_is_public'), table_name='releases')
     op.drop_index(op.f('ix_releases_created_by'), table_name='releases')
     op.drop_table('releases')
-    op.drop_table('user_albums')
-    op.drop_table('storage_slots')
     op.drop_table('storage_groups')
     op.drop_index(op.f('ix_album_works_year_composed'), table_name='album_works')
     op.drop_index(op.f('ix_album_works_updated_by'), table_name='album_works')

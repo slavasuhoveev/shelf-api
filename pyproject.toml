@@ -53,6 +53,12 @@ check = [
   "format"
 ]
 
+# 13. Downgrade db completely (use with caution)
+downgrade = "docker exec ${PROJECT_NAME}_api alembic downgrade base"
+
+# 14. Stop containers and remove volumes (use with caution)
+down_volumes = "docker compose down -v"
+
 
 [tool.poetry.dependencies]
 python = "3.12.*"

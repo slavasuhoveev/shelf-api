@@ -26,6 +26,8 @@ services:
       context: .
     image: ${PROJECT_NAME}:develop
     container_name: ${PROJECT_NAME}_api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgresql:
         condition: service_healthy
@@ -34,17 +36,17 @@ services:
       POSTGRES_HOST: postgresql
       POSTGRES_PORT: 5432
       PYTHONPATH: /app/src
-      AUTH_JWKS_URL: http://shelf_auth:8081/.well-known/jwks.json
+      AUTH_JWKS_URL: http://host.docker.internal:8081/.well-known/jwks.json
       JWT_ISSUER: ${PROJECT_NAME}-auth
-      JWT_AUDIENCE: ${PROJECT_NAME}
+      JWT_AUDIENCE: ${PROJECT_NAME}-api
       JWKS_CACHE_TTL_SECONDS: 300
     volumes:
       - ./src:/app/src:delegated
       - ./alembic:/app/alembic:delegated
       - ./alembic.ini:/app/alembic.ini:delegated
-    command: uvicorn shelf.app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn shelf.app.main:app --host 0.0.0.0 --port 8082 --reload
     ports:
-      - "8000:8000"
+      - "8082:8082"
     tty: true
     stdin_open: true
 

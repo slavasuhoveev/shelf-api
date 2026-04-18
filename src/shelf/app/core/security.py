@@ -8,6 +8,8 @@ import time
 import httpx
 from typing import Dict, Any
 from jose import jwt
+from jose import ExpiredSignatureError, JWTError
+from fastapi import HTTPException
 
 from shelf.app.core.config import settings
 from shelf.app.schemas.auth import TokenPayload
@@ -61,7 +63,7 @@ class JWKSClient:
         if self._cache and now - self._last_fetch < settings.JWKS_CACHE_TTL_SECONDS:
             return self._cache
 
-        response = httpx.get(settings.AUTH_JWKS_URL, timeout=5)
+        response = httpx.get(str(settings.AUTH_JWKS_URL), timeout=5)
         response.raise_for_status()
 
         self._cache = response.json()
@@ -84,12 +86,20 @@ def verify_access_token(token: str) -> dict:
     if not key:
         raise InvalidTokenError
 
-    payload_dict = jwt.decode(
-        token,
-        key,
-        algorithms=["RS256"],
-        audience=settings.JWT_AUDIENCE,
-        issuer=settings.JWT_ISSUER,
-    )
+    try:
+        payload_dict = jwt.decode(
+            token,
+            key,
+            algorithms=["RS256"],
+            audience=settings.JWT_AUDIENCE,
+            issuer=settings.JWT_ISSUER,
+        )
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401,
+                            detail="Token expired") from None
+
+    except JWTError:
+        raise HTTPException(status_code=401,
+                            detail="Invalid token") from None
 
     return TokenPayload(**payload_dict)

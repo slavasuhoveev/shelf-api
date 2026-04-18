@@ -24,10 +24,10 @@ class AlbumWorkCreate(BaseModel):
 
     title: Annotated[str, constr(min_length=1, max_length=255)]
     artist: Annotated[str, constr(min_length=1, max_length=255)]
-    year_composed: Annotated[int, Field(ge=1900, le=2100)]
-    genre: Annotated[str, constr(min_length=1, max_length=50)]
-    style: Annotated[str, constr(min_length=1, max_length=100)]
-    tracks: list[Annotated[str, constr(min_length=1)]]
+    year_composed: Annotated[int, Field(1900, ge=1900, le=2100)]
+    genre: Annotated[str, constr(min_length=1, max_length=50)] = "unknown"
+    style: Annotated[str, constr(min_length=1, max_length=100)] = "unknown"
+    tracks: list[Annotated[str, constr(min_length=1)]] = Field(default_factory=list)
     notes: Optional[str] = None
     is_public: bool = False
 
