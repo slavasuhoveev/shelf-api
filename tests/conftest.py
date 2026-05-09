@@ -1,4 +1,5 @@
 import os
+from types import SimpleNamespace
 from uuid import UUID
 
 import pytest
@@ -7,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
-from shelf.app.dependencies import get_db
+from shelf.app.dependencies import get_db, get_token_payload, require_auth
 from shelf.app.main import app
 from shelf.app.models.base import Base
 
@@ -54,11 +55,26 @@ def db_session(setup_database):
 
 
 @pytest.fixture()
+def unauthenticated_client():
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture()
 def client(db_session):
     def override_get_db():
         yield db_session
 
+    def override_require_auth():
+        return None
+
+    def override_get_token_payload():
+        return SimpleNamespace(sub=DUMMY_USER_ID, email='test@example.com')
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[require_auth] = override_require_auth
+    app.dependency_overrides[get_token_payload] = override_get_token_payload
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()

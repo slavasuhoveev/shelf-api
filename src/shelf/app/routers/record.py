@@ -147,12 +147,6 @@ def update_album_work_route(
     HTTPException: If the AlbumWork is not found.
 
     """
-    print('')
-    print('')
-    print('album_id', album_id)
-    print('')
-    print('')
-
     db_obj = record_crud.get_album_work(db, album_id)
     if not db_obj:
         raise HTTPException(
@@ -597,7 +591,7 @@ def update_user_album_route(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="UserAlbum not found"
         )
-    return record_crud.update_user_album(db, db_obj, user_album_id, user.sub)
+    return record_crud.update_user_album(db, db_obj, user_album_in)
 
 
 @user_album_router.delete("/{user_album_id}", status_code=status.HTTP_204_NO_CONTENT)

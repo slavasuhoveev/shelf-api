@@ -417,7 +417,6 @@ def create_user_album(
     obj = UserAlbum(
         user_id=user_id,
         medium_id=user_album_in.medium_id,
-        slot_id=user_album_in.slot_id,
         custom_notes=user_album_in.custom_notes,
         custom_cover=user_album_in.custom_cover,
         vinyl_grade=user_album_in.vinyl_grade,

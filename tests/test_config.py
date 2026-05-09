@@ -11,4 +11,4 @@ def test_postgres_url_parsing(monkeypatch):
     importlib.reload(importlib.import_module('shelf.app.env'))
     config = importlib.reload(importlib.import_module('shelf.app.core.config'))
 
-    assert config.POSTGRES_URL == 'postgresql://user:pass@host:1234/db'
+    assert config.settings.postgres_url == 'postgresql://user:pass@host:1234/db'

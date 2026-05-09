@@ -60,7 +60,7 @@ def create_storage_slot_route(
     StorageSlot: The created StorageSlot object.
 
     """
-    return shelf_crud.create_storage_slot(db, storage_slot_in, user.sub)
+    return shelf_crud.create_storage_slot(db, storage_slot_in)
 
 
 @storage_slot_router.get("/{storage_slot_id}", response_model=shelf_schemas.StorageSlotRead)
@@ -149,7 +149,7 @@ def update_storage_slot_route(
             detail="StorageSlot not found"
         )
 
-    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in, user.sub)
+    return shelf_crud.update_storage_slot(db, db_obj, storage_slot_in)
 
 
 @storage_slot_router.delete("/{storage_slot_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -295,7 +295,7 @@ def update_storage_item_route(
             detail="StorageItem not found"
         )
 
-    return shelf_crud.update_storage_item(db, db_obj, storage_item_in, user.sub)
+    return shelf_crud.update_storage_item(db, db_obj, storage_item_in)
 
 
 @storage_item_router.delete("/{storage_item_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -441,7 +441,7 @@ def update_storage_group_route(
             detail="StorageGroup not found"
         )
 
-    return shelf_crud.update_storage_group(db, db_obj, storage_group_in, user.sub)
+    return shelf_crud.update_storage_group(db, db_obj, storage_group_in)
 
 
 @storage_group_router.delete("/{storage_group_id}", status_code=status.HTTP_204_NO_CONTENT)

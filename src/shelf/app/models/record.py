@@ -194,7 +194,7 @@ class UserAlbum(BaseModel):
         id: Unique album identifier (UUID).
         user_id: Unique user identifier (UUID).
         medium_id: related album medium identifier (UUID).
-        slot_id: related album position in shelf identifier (UUID).
+        storage_slot: related album position in shelf identifier (UUID).
         custom_notes: Additional user notes about the album.
         custom_cover: Cover url (str).
         vinyl_grade: Vinyl shape grade.
