@@ -1,9 +1,13 @@
-version: '3.8'
-
 x-postgres-cred: &postgres-cred
   POSTGRES_USER: ${PROJECT_NAME}_user
   POSTGRES_PASSWORD: ${PROJECT_NAME}
   POSTGRES_DB: ${PROJECT_NAME}_db
+
+x-global_envs: &global_envs
+  AUTH_JWKS_URL: http://host.docker.internal:8081/.well-known/jwks.json
+  JWT_ISSUER: ${PROJECT_NAME}-auth
+  JWT_AUDIENCE: ${PROJECT_NAME}-api
+  JWKS_CACHE_TTL_SECONDS: 300
 
 services:
   postgresql:
@@ -21,10 +25,11 @@ services:
     ports:
       - "5433:5432"
 
-  api:
+  shelf_api:
     build:
       context: .
-    image: ${PROJECT_NAME}:develop
+      target: development
+    image: ${PROJECT_NAME}:${TAG}
     container_name: ${PROJECT_NAME}_api
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -32,14 +37,12 @@ services:
       postgresql:
         condition: service_healthy
     environment:
-      <<: *postgres-cred
+      <<:
+        - *global_envs
+        - *postgres-cred
       POSTGRES_HOST: postgresql
       POSTGRES_PORT: 5432
       PYTHONPATH: /app/src
-      AUTH_JWKS_URL: http://host.docker.internal:8081/.well-known/jwks.json
-      JWT_ISSUER: ${PROJECT_NAME}-auth
-      JWT_AUDIENCE: ${PROJECT_NAME}-api
-      JWKS_CACHE_TTL_SECONDS: 300
     volumes:
       - ./src:/app/src:delegated
       - ./alembic:/app/alembic:delegated
@@ -49,6 +52,27 @@ services:
       - "8082:8082"
     tty: true
     stdin_open: true
+
+  shelf_tests:
+    build:
+      context: .
+      target: tests
+
+    environment:
+      <<:
+        - *global_envs
+        - *postgres-cred
+      TEST_POSTGRES_URL: postgresql://${PROJECT_NAME}_user:${PROJECT_NAME}@postgresql:5432/${PROJECT_NAME}_db
+
+    depends_on:
+      postgresql:
+        condition: service_healthy
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
 
 volumes:
   postgres-data:

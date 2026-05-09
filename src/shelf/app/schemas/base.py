@@ -14,10 +14,6 @@ class BaseShelfModel(BaseModel):
     validate_assignment: True
         Automatically validate and coerce values when assigning to fields after model initialization.
 
-    strict: True
-        Enforces strict type checking (e.g., int is not accepted where float is expected, and vice versa).
-        Helps catch subtle bugs and ensures predictable validation.
-
     use_enum_values: True
         Automatically converts Enum members to their values when exporting or serializing the model.
         For example, Color.RED will be serialized as "red" instead of "Color.RED".
@@ -37,7 +33,6 @@ class BaseShelfModel(BaseModel):
 
     model_config = ConfigDict(
         validate_assignment=True,
-        strict=True,
         use_enum_values=True,
         extra="forbid",
         exclude_none=True,

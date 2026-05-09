@@ -94,14 +94,15 @@ class StorageItemUpdate(BaseModel):
 class StorageGroupCreate(BaseModel):
     """Pydatic schema for StorageGroup object creation."""
 
-    title: Annotated[str, constr(min_length=1, max_length=100)]
-    description: Optional[Annotated[str, constr(min_length=1, max_length=250)]] = None
+    title: str = Field(min_length=1, max_length=100)
+    description: Optional[str] = Field(None, min_length=1, max_length=250)
     is_public: bool = False
 
 
 class StorageGroupRead(BaseModel):
     """Pydatic schema for StorageGroup object getting."""
 
+    id: UUID
     user_id: UUID
     title: str
     description: Optional[str] = None
@@ -114,6 +115,6 @@ class StorageGroupRead(BaseModel):
 class StorageGroupUpdate(BaseModel):
     """Pydatic schema for StorageGroup object updating."""
 
-    title: Optional[Annotated[str, constr(min_length=1, max_length=100)]] = None
-    description: Optional[Annotated[str, constr(min_length=1, max_length=250)]] = None
+    title: Optional[str] = Field(None, min_length=1, max_length=100)
+    description: Optional[str] = Field(None, min_length=1, max_length=250)
     is_public: Optional[bool] = None
