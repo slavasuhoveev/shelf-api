@@ -19,6 +19,7 @@ from uuid import UUID
 
 # StorageSlot model crud
 
+
 def create_storage_slot(
     db: Session,
     storage_slot_in: StorageSlotCreate,
@@ -128,6 +129,7 @@ def delete_storage_slot(db: Session, storage_slot_id: UUID) -> None:
 
 
 # StorageItem model crud
+
 
 def create_storage_item(
     db: Session,
@@ -244,6 +246,7 @@ def delete_storage_item(db: Session, storage_item_id: UUID) -> None:
 
 
 # StorageGroup model crud
+
 
 def create_storage_group(
     db: Session,

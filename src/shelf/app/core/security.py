@@ -78,10 +78,10 @@ jwks_client = JWKSClient()
 def verify_access_token(token: str) -> dict:
     """Verify JWT access token and return payload."""
     unverified_header = jwt.get_unverified_header(token)
-    kid = unverified_header.get("kid")
+    kid = unverified_header.get('kid')
 
     jwks = jwks_client.get_jwks()
-    key = next((k for k in jwks["keys"] if k["kid"] == kid), None)
+    key = next((k for k in jwks['keys'] if k['kid'] == kid), None)
 
     if not key:
         raise InvalidTokenError
@@ -90,16 +90,14 @@ def verify_access_token(token: str) -> dict:
         payload_dict = jwt.decode(
             token,
             key,
-            algorithms=["RS256"],
+            algorithms=['RS256'],
             audience=settings.JWT_AUDIENCE,
             issuer=settings.JWT_ISSUER,
         )
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401,
-                            detail="Token expired") from None
+        raise HTTPException(status_code=401, detail='Token expired') from None
 
     except JWTError:
-        raise HTTPException(status_code=401,
-                            detail="Invalid token") from None
+        raise HTTPException(status_code=401, detail='Invalid token') from None
 
     return TokenPayload(**payload_dict)

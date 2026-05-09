@@ -7,19 +7,90 @@ from shelf.app.crud import record as record_crud
 from shelf.app.crud import shelf as shelf_crud
 from shelf.app.enums.record import MediumFormat
 from shelf.app.enums.shelf import StorageType
-from shelf.app.schemas.record import AlbumWorkCreate, AlbumWorkUpdate, MediumCreate, MediumUpdate, ReleaseCreate, ReleaseUpdate, UserAlbumCreate, UserAlbumUpdate
-from shelf.app.schemas.shelf import StorageGroupCreate, StorageGroupUpdate, StorageItemCreate, StorageItemUpdate, StorageSlotCreate, StorageSlotUpdate
+from shelf.app.schemas.record import (
+    AlbumWorkCreate,
+    AlbumWorkUpdate,
+    MediumCreate,
+    MediumUpdate,
+    ReleaseCreate,
+    ReleaseUpdate,
+    UserAlbumCreate,
+    UserAlbumUpdate,
+)
+from shelf.app.schemas.shelf import (
+    StorageGroupCreate,
+    StorageGroupUpdate,
+    StorageItemCreate,
+    StorageItemUpdate,
+    StorageSlotCreate,
+    StorageSlotUpdate,
+)
 
 
 def create_chain(db_session):
     user_id = uuid4()
-    album = record_crud.create_album_work(db_session, AlbumWorkCreate(title='A', artist='B', year_composed=1990, genre='Rock', style='Alt', tracks=['T1']), user_id)
-    release = record_crud.create_release(db_session, ReleaseCreate(album_work_id=album.id, label='L', country='US', year=1990, tracklist=['T1'], notes=None), user_id)
-    medium = record_crud.create_medium(db_session, MediumCreate(release_id=release.id, format=MediumFormat.VINYL, medium_count=1, sides=[{}], color_hint='black'), user_id)
+    album = record_crud.create_album_work(
+        db_session,
+        AlbumWorkCreate(
+            title='A',
+            artist='B',
+            year_composed=1990,
+            genre='Rock',
+            style='Alt',
+            tracks=['T1'],
+        ),
+        user_id,
+    )
+    release = record_crud.create_release(
+        db_session,
+        ReleaseCreate(
+            album_work_id=album.id,
+            label='L',
+            country='US',
+            year=1990,
+            tracklist=['T1'],
+            notes=None,
+        ),
+        user_id,
+    )
+    medium = record_crud.create_medium(
+        db_session,
+        MediumCreate(
+            release_id=release.id,
+            format=MediumFormat.VINYL,
+            medium_count=1,
+            sides=[{}],
+            color_hint='black',
+        ),
+        user_id,
+    )
     user_album = record_crud.create_user_album(db_session, UserAlbumCreate(medium_id=medium.id), user_id)
-    group = shelf_crud.create_storage_group(db_session, StorageGroupCreate(title='Group', description='Main', is_public=False), user_id)
-    item = shelf_crud.create_storage_item(db_session, StorageItemCreate(group_id=group.id, title='Item', description='desc', storage_type=StorageType.SHELF, form_vector={}, position_vector=None), user_id)
-    slot = shelf_crud.create_storage_slot(db_session, StorageSlotCreate(storage_item_id=item.id, user_album_id=user_album.id, position={}, capacity=1))
+    group = shelf_crud.create_storage_group(
+        db_session,
+        StorageGroupCreate(title='Group', description='Main', is_public=False),
+        user_id,
+    )
+    item = shelf_crud.create_storage_item(
+        db_session,
+        StorageItemCreate(
+            group_id=group.id,
+            title='Item',
+            description='desc',
+            storage_type=StorageType.SHELF,
+            form_vector={},
+            position_vector=None,
+        ),
+        user_id,
+    )
+    slot = shelf_crud.create_storage_slot(
+        db_session,
+        StorageSlotCreate(
+            storage_item_id=item.id,
+            user_album_id=user_album.id,
+            position={},
+            capacity=1,
+        ),
+    )
     return album, release, medium, user_album, group, item, slot
 
 
@@ -59,8 +130,22 @@ def test_crud_get_and_list(db_session, name, getter, lister):
         pytest.param('album', record_crud.update_album_work, AlbumWorkUpdate, 'title', 'Updated', id='album'),
         pytest.param('release', record_crud.update_release, ReleaseUpdate, 'label', 'Updated', id='release'),
         pytest.param('medium', record_crud.update_medium, MediumUpdate, 'color_hint', 'white', id='medium'),
-        pytest.param('user_album', record_crud.update_user_album, UserAlbumUpdate, 'custom_notes', 'Updated', id='user_album'),
-        pytest.param('group', shelf_crud.update_storage_group, StorageGroupUpdate, 'title', 'Updated', id='storage_group'),
+        pytest.param(
+            'user_album',
+            record_crud.update_user_album,
+            UserAlbumUpdate,
+            'custom_notes',
+            'Updated',
+            id='user_album',
+        ),
+        pytest.param(
+            'group',
+            shelf_crud.update_storage_group,
+            StorageGroupUpdate,
+            'title',
+            'Updated',
+            id='storage_group',
+        ),
         pytest.param('item', shelf_crud.update_storage_item, StorageItemUpdate, 'title', 'Updated', id='storage_item'),
         pytest.param('slot', shelf_crud.update_storage_slot, StorageSlotUpdate, 'capacity', 2, id='storage_slot'),
     ],
@@ -120,6 +205,13 @@ def test_crud_invalid_foreign_key_raises(db_session):
     with pytest.raises(IntegrityError):
         record_crud.create_release(
             db_session,
-            ReleaseCreate(album_work_id=uuid4(), label='X', country='US', year=2000, tracklist=['T1'], notes=None),
+            ReleaseCreate(
+                album_work_id=uuid4(),
+                label='X',
+                country='US',
+                year=2000,
+                tracklist=['T1'],
+                notes=None,
+            ),
             uuid4(),
         )

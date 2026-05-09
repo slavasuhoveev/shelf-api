@@ -15,6 +15,7 @@ from shelf.app.schemas.base import BaseShelfModel as BaseModel
 
 # StorageSlot model
 
+
 class StorageSlotCreate(BaseModel):
     """Pydatic schema for StorageSlot object creation."""
 
@@ -46,6 +47,7 @@ class StorageSlotUpdate(BaseModel):
 
 
 # StorageItem model
+
 
 class StorageItemCreate(BaseModel):
     """Pydatic schema for StorageItem object creation."""
@@ -90,6 +92,7 @@ class StorageItemUpdate(BaseModel):
 
 
 # StorageGroup model
+
 
 class StorageGroupCreate(BaseModel):
     """Pydatic schema for StorageGroup object creation."""

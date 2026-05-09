@@ -26,6 +26,7 @@ from uuid import UUID
 
 # AlbumWork model crud
 
+
 def create_album_work(
     db: Session,
     album_in: AlbumWorkCreate,
@@ -150,6 +151,7 @@ def delete_album_work(db: Session, album_id: UUID) -> None:
 
 # Release model crud
 
+
 def create_release(
     db: Session,
     release_in: ReleaseCreate,
@@ -273,6 +275,7 @@ def delete_release(db: Session, release_id: UUID) -> None:
 
 # Medium model crud
 
+
 def create_medium(
     db: Session,
     medium_in: MediumCreate,
@@ -395,6 +398,7 @@ def delete_medium(db: Session, medium_id: UUID) -> None:
 
 
 # UserAlbum model crud
+
 
 def create_user_album(
     db: Session,

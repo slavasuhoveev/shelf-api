@@ -5,59 +5,30 @@ description = ""
 authors = ["Slava <brainout8@gmail.com>"]
 readme = "README.md"
 
-[tool.poe.env]
-PROJECT_NAME = "shelf"
-BASE_IMAGE = "shelf"
-IMAGE = "shelf:develop"
-
 [tool.poe.tasks]
-# 1. Build Docker image
-docker-build = "docker build --target development ${DOCKER_BUILD_OPTS} -t ${IMAGE} ."
 
-# 2. Run containers using docker-compose
-up = "docker compose up -d"
+# =========================
+# Database migrations
+# =========================
 
-# 3. Stop containers
-down = "docker compose down"
-
-# 4. Runs application development on docker.
-run = [
-  "docker-build",
-  "up"
-]
-
-# 5. Make Alembic migration
 makemigrations = "docker exec ${PROJECT_NAME}_api alembic revision --autogenerate -m 'new revision'"
 
-# 6. Apply Alembic migrations
 migrate = "docker exec ${PROJECT_NAME}_api alembic upgrade head"
 
-# 7. Run tests
-test = "docker compose exec ${PROJECT_NAME}_api pytest"
-
-# 8. Show logs
-logs = "docker-compose logs -f"
-
-# 9. Run Ruff linter
-lint = "ruff check ."
-
-# 10. Run Ruff with auto-fix
-lint-fix = "ruff check . --fix"
-
-# 11. Run Ruff formatter
-format = "ruff format ."
-
-# 12. Run full quality check
-check = [
-  "lint",
-  "format"
-]
-
-# 13. Downgrade db completely (use with caution)
 downgrade = "docker exec ${PROJECT_NAME}_api alembic downgrade base"
 
-# 14. Stop containers and remove volumes (use with caution)
-down_volumes = "docker compose down -v"
+
+# =========================
+# Ruff linting
+# =========================
+
+lint = "ruff check ."
+
+lint-fix = "ruff check . --fix"
+
+format = "ruff format ."
+
+format-check = "ruff format . --check"
 
 
 [tool.poetry.dependencies]
@@ -72,59 +43,90 @@ alembic = "^1.16.1"
 python-dotenv = "^1.1.0"
 httpx = "^0.28.1"
 pydantic-settings = "^2.13.1"
-python-jose = {extras = ["cryptography"], version = "^3.5.0"}
+python-jose = { extras = ["cryptography"], version = "^3.5.0" }
+
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.34.0"
 ruff = "^0.4.0"
 alembic = "^1.16.4"
 
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.5"
+pytest-asyncio = "^0.26.0"
+
+
 [tool.ruff]
 line-length = 120
+
 
 [tool.ruff.lint]
 select = [
     # pycodestyle
     "E",
     "W",
+
     # Pyflakes
     "F",
-    #mccabe
+
+    # mccabe
     "C901",
+
     # flake8-bugbear
     "B",
+
     # flake8-print
     "T20",
+
     # flake8-mutable
     "B006",
+
     # flake8-builtins
     "A",
+
     # flake8-pydocstyle
     "D",
+
     # flake8-async
     "ASYNC",
+
     # pep8-naming
     "N",
+
     # tryceratops
     "TRY",
+
     # flake8-bandit
     "S",
 ]
+
 ignore = [
   "D203",  # Conflicts with D211
   "D213",  # Conflicts with D212
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D100",  # Test module names describe their purpose.
+    "D103",  # Test function names describe their behavior.
+    "D104",  # Test package marker files do not need docstrings.
+    "S101",  # Pytest uses assert statements for checks.
+]
+
+
 [tool.ruff.format]
 quote-style = "single"
-indent-style = "tab"
+indent-style = "space"
 docstring-code-format = true
+
 
 [tool.ruff.lint.pep8-naming]
 classmethod-decorators = [
     "classmethod",
     "classproperty",
 ]
+
 
 [tool.pytest.ini_options]
 pythonpath = "src"
