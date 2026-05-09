@@ -14,11 +14,11 @@ class Settings(BaseSettings):
     # ----------------------------
     # Database configuration
     # ----------------------------
-    POSTGRES_USER: str = "shelf_user"
-    POSTGRES_PASSWORD: str = "shelf"
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_USER: str = 'shelf_user'
+    POSTGRES_PASSWORD: str = 'shelf'
+    POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = "shelf_db"
+    POSTGRES_DB: str = 'shelf_db'
 
     # ----------------------------
     # JWT / Auth configuration
@@ -36,17 +36,17 @@ class Settings(BaseSettings):
     def postgres_url(self) -> str:
         """Postgres URL built from individual components."""
         return (
-            f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            f'postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}'
+            f'@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
         )
 
     # ----------------------------
     # Settings config
     # ----------------------------
     model_config = SettingsConfigDict(
-        env_file="../.env",
-        env_file_encoding="utf-8",
-        extra="ignore",
+        env_file='../.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
     )
 
 

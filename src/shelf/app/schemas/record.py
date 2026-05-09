@@ -5,7 +5,8 @@ from typing import Annotated, Optional
 from uuid import UUID
 
 from pydantic import (
-    Field, constr,
+    Field,
+    constr,
 )
 
 from shelf.app.enums.record import (
@@ -19,14 +20,15 @@ from shelf.app.schemas.base import BaseShelfModel as BaseModel
 
 # AlbumWork model
 
+
 class AlbumWorkCreate(BaseModel):
     """Pydatic schema for AlbumWork object creation."""
 
     title: Annotated[str, constr(min_length=1, max_length=255)]
     artist: Annotated[str, constr(min_length=1, max_length=255)]
     year_composed: Annotated[int, Field(1900, ge=1900, le=2100)]
-    genre: Annotated[str, constr(min_length=1, max_length=50)] = "unknown"
-    style: Annotated[str, constr(min_length=1, max_length=100)] = "unknown"
+    genre: Annotated[str, constr(min_length=1, max_length=50)] = 'unknown'
+    style: Annotated[str, constr(min_length=1, max_length=100)] = 'unknown'
     tracks: list[Annotated[str, constr(min_length=1)]] = Field(default_factory=list)
     notes: Optional[str] = None
     is_public: bool = False
@@ -65,6 +67,7 @@ class AlbumWorkUpdate(BaseModel):
 
 
 # Release model
+
 
 class ReleaseCreate(BaseModel):
     """Pydatic schema for Release object creation."""
@@ -112,6 +115,7 @@ class ReleaseUpdate(BaseModel):
 
 # Medium model
 
+
 class MediumCreate(BaseModel):
     """Pydatic schema for Medium object creation."""
 
@@ -155,6 +159,7 @@ class MediumUpdate(BaseModel):
 
 
 # UserAlbum model
+
 
 class UserAlbumCreate(BaseModel):
     """Pydatic schema for UserAlbumm object creation."""

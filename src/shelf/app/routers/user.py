@@ -18,18 +18,16 @@ from shelf.app.schemas.auth import TokenPayload
 
 
 user_router = APIRouter(
-    prefix="/api",
+    prefix='/api',
     dependencies=[Depends(require_auth)],
-    tags=["Shelf", "User"],
+    tags=['Shelf', 'User'],
 )
 
 
-@user_router.get("/me")
-def get_me(
-    payload: Annotated[TokenPayload, Depends(get_token_payload)]
-):
+@user_router.get('/me')
+def get_me(payload: Annotated[TokenPayload, Depends(get_token_payload)]):
     """Return current authenticated user profile in Shelf context."""
     return {
-        "user_id": payload.sub,
-        "email": payload.email,
+        'user_id': payload.sub,
+        'email': payload.email,
     }

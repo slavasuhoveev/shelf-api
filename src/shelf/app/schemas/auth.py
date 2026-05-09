@@ -5,6 +5,7 @@ Defines JWT token payload structures.
 
 from pydantic import BaseModel
 
+
 class TokenPayload(BaseModel):
     """JWT claims we care about inside Shelf API."""
 

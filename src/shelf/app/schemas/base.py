@@ -32,9 +32,5 @@ class BaseShelfModel(BaseModel):
     """
 
     model_config = ConfigDict(
-        validate_assignment=True,
-        use_enum_values=True,
-        extra="forbid",
-        exclude_none=True,
-        from_attributes=True
+        validate_assignment=True, use_enum_values=True, extra='forbid', exclude_none=True, from_attributes=True
     )

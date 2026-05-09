@@ -10,9 +10,5 @@ from sqlalchemy.orm import sessionmaker
 from shelf.app.core.config import settings
 
 
-engine = create_engine(
-    settings.postgres_url,
-    poolclass=NullPool,
-    future=True
-)
+engine = create_engine(settings.postgres_url, poolclass=NullPool, future=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

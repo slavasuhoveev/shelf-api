@@ -39,39 +39,28 @@ class AlbumWork(BaseModel):
         is_public: Whether the album entry is publicly visible.
     """
 
-    __tablename__ = "album_works"
+    __tablename__ = 'album_works'
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
     artist: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
     year_composed: Mapped[int] = mapped_column(index=True, nullable=False)
     genre: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
     style: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
-    tracks: Mapped[list[str]] = mapped_column(
-        ARRAY(String(100)),
-        nullable=False
-    )
+    tracks: Mapped[list[str]] = mapped_column(ARRAY(String(100)), nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(nullable=True)
-    created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=False
-    )
-    updated_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=True
-    )
-    is_verified: Mapped[bool] = mapped_column(server_default="false", index=True, nullable=False)
-    is_public: Mapped[bool] = mapped_column(server_default="false", index=True, nullable=False)
+    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=False)
+    updated_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(server_default='false', index=True, nullable=False)
+    is_public: Mapped[bool] = mapped_column(server_default='false', index=True, nullable=False)
 
-    releases: Mapped[list["Release"]] = relationship(
-        back_populates="album_work",
-        cascade="all, delete-orphan",
-        lazy="selectin"
+    releases: Mapped[list['Release']] = relationship(
+        back_populates='album_work', cascade='all, delete-orphan', lazy='selectin'
     )
 
     def __repr__(self) -> str:
         """AlbumWork representation string."""
-        return f"Album work: {self.title}"
+        return f'Album work: {self.title}'
 
 
 class Release(BaseModel):
@@ -91,42 +80,33 @@ class Release(BaseModel):
         is_public: Whether the album entry is publicly visible.
     """
 
-    __tablename__ = "releases"
+    __tablename__ = 'releases'
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    album_work_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("album_works.id"),
-                                                     nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    album_work_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('album_works.id'), nullable=False)
     label: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True)
     country: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     year: Mapped[int] = mapped_column(index=True, nullable=False)
     tracklist: Mapped[list[str]] = mapped_column(
         # Postgres array
         ARRAY(String(100)),
-        nullable=False
+        nullable=False,
     )
     notes: Mapped[Optional[str]] = mapped_column(nullable=True)
-    created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=False
-    )
-    updated_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=True
-    )
-    is_verified: Mapped[bool] = mapped_column(server_default="false", index=True, nullable=False)
-    is_public: Mapped[bool] = mapped_column(server_default="true", index=True, nullable=False)
+    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=False)
+    updated_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(server_default='false', index=True, nullable=False)
+    is_public: Mapped[bool] = mapped_column(server_default='true', index=True, nullable=False)
 
-    album_work = relationship("AlbumWork", back_populates="releases", lazy="selectin")
+    album_work = relationship('AlbumWork', back_populates='releases', lazy='selectin')
 
-    mediums: Mapped[list["Medium"]] = relationship(
-        back_populates="release",
-        cascade="all, delete-orphan",
-        lazy="selectin"
+    mediums: Mapped[list['Medium']] = relationship(
+        back_populates='release', cascade='all, delete-orphan', lazy='selectin'
     )
 
     def __repr__(self) -> str:
         """Release representation string."""
-        return f"Release {self.id} of album {self.album_work_id}"
+        return f'Release {self.id} of album {self.album_work_id}'
 
 
 class Medium(BaseModel):
@@ -146,45 +126,31 @@ class Medium(BaseModel):
         is_public: Whether the album entry is publicly visible.
     """
 
-    __tablename__ = "mediums"
+    __tablename__ = 'mediums'
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    release_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("releases.id"),
-                                                  nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    release_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('releases.id'), nullable=False)
     format: Mapped[MediumFormat] = mapped_column(
-        SQLEnum(MediumFormat, name="medium_format"),
-        index=True,
-        nullable=False
+        SQLEnum(MediumFormat, name='medium_format'), index=True, nullable=False
     )
     medium_count: Mapped[int] = mapped_column(nullable=False)
-    sides: Mapped[list[dict]] = mapped_column(
-        JSON,
-        nullable=False
-    )
+    sides: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
     color_hint: Mapped[str] = mapped_column(String(10), nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(nullable=True)
-    created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=False
-    )
-    updated_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), index=True, nullable=True
-    )
-    is_verified: Mapped[bool] = mapped_column(server_default="false", index=True, nullable=False)
-    is_public: Mapped[bool] = mapped_column(server_default="true", index=True, nullable=False)
+    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=False)
+    updated_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(server_default='false', index=True, nullable=False)
+    is_public: Mapped[bool] = mapped_column(server_default='true', index=True, nullable=False)
 
-    release = relationship("Release", back_populates="mediums", lazy="selectin")
+    release = relationship('Release', back_populates='mediums', lazy='selectin')
 
-    user_albums: Mapped[list["UserAlbum"]] = relationship(
-        back_populates="medium",
-        cascade="all, delete-orphan",
-        lazy="selectin"
+    user_albums: Mapped[list['UserAlbum']] = relationship(
+        back_populates='medium', cascade='all, delete-orphan', lazy='selectin'
     )
 
     def __repr__(self) -> str:
         """Medium representation string."""
-        return f"Medium {self.id} of release {self.release_id}"
+        return f'Medium {self.id} of release {self.release_id}'
 
 
 class UserAlbum(BaseModel):
@@ -202,36 +168,27 @@ class UserAlbum(BaseModel):
         is_shared: Is user shared his album to others.
     """
 
-    __tablename__ = "user_albums"
+    __tablename__ = 'user_albums'
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), nullable=False
-    )
-    medium_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("mediums.id"),
-                                                  nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    medium_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('mediums.id'), nullable=False)
     custom_notes: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     custom_cover: Mapped[Optional[str]] = mapped_column(nullable=True)
-    vinyl_grade: Mapped[Optional[RecordGrade]] = mapped_column(
-        SQLEnum(RecordGrade, name="vinyl_grade"),
-        nullable=True
-    )
+    vinyl_grade: Mapped[Optional[RecordGrade]] = mapped_column(SQLEnum(RecordGrade, name='vinyl_grade'), nullable=True)
     sleeve_grade: Mapped[Optional[SleeveGrade]] = mapped_column(
-        SQLEnum(SleeveGrade, name="sleeve_grade"),
-        nullable=True
+        SQLEnum(SleeveGrade, name='sleeve_grade'), nullable=True
     )
-    is_shared: Mapped[bool] = mapped_column(server_default="false", nullable=False)
+    is_shared: Mapped[bool] = mapped_column(server_default='false', nullable=False)
 
-    medium = relationship("Medium", back_populates="user_albums", lazy="selectin")
+    medium = relationship('Medium', back_populates='user_albums', lazy='selectin')
 
     storage_slot: Mapped[Optional[StorageSlot]] = relationship(
         StorageSlot,
-        back_populates="user_album",
+        back_populates='user_album',
         uselist=False,
     )
 
     def __repr__(self) -> str:
         """UserAlbum representation string."""
-        return f"User album {self.id} of medium {self.medium_id}"
+        return f'User album {self.id} of medium {self.medium_id}'

@@ -33,26 +33,28 @@ def get_db() -> Generator[Session, None, None]:
 
 def require_auth(request: Request) -> None:
     """Validate JWT and store payload in request.state (router guard)."""
-    auth_header = request.headers.get("Authorization")
+    auth_header = request.headers.get('Authorization')
 
-    if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token")
+    if not auth_header or not auth_header.startswith('Bearer '):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Missing bearer token')
 
-    token = auth_header.split(" ", 1)[1].strip()
+    token = auth_header.split(' ', 1)[1].strip()
 
     try:
         payload = verify_access_token(token)  # returns TokenPayload (or dict)
     except (JWKSKeyNotFoundError, InvalidTokenError):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail="Invalid or expired token",) from None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid or expired token',
+        ) from None
 
     request.state.token_payload = payload
 
 
 def get_token_payload(request: Request):
     """Return payload already validated by require_auth."""
-    payload = getattr(request.state, "token_payload", None)
+    payload = getattr(request.state, 'token_payload', None)
     if payload is None:
         # means someone called this dependency without router guard
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Not authenticated')
     return payload

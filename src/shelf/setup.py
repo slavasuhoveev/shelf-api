@@ -18,7 +18,6 @@ requires = [
     'pyramid_debugtoolbar',
     'waitress',
     'zope.sqlalchemy',
-
     # postgresql
     'psycopg2',
     'alembic',
