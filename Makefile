@@ -12,7 +12,8 @@
 
 PROJECT_NAME := shelf
 
-IMAGE_NAME := ghcr.io/<github-username>/shelf-api
+REGISTRY ?= ghcr.io
+IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/shelf-api
 TAG ?= develop
 
 DOCKER_BUILD_OPTS ?=
