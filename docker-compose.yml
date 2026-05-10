@@ -29,7 +29,7 @@ services:
     build:
       context: .
       target: development
-    image: ${PROJECT_NAME}:${TAG}
+    image: ${IMAGE_NAME}:${TAG}
     container_name: ${PROJECT_NAME}_api
     extra_hosts:
       - "host.docker.internal:host-gateway"

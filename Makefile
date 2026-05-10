@@ -14,7 +14,7 @@ PROJECT_NAME := shelf
 
 REGISTRY ?= ghcr.io
 IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/shelf-api
-TAG ?= develop
+TAG ?= latest
 
 DOCKER_BUILD_OPTS ?=
 
