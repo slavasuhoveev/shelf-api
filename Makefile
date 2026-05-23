@@ -13,31 +13,37 @@
 PROJECT_NAME := shelf
 
 REGISTRY ?= ghcr.io
-IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/shelf-api
-TAG ?= latest
+IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/$(PROJECT_NAME)
+
+# Default local tag
+TAG ?= develop
+
+ifdef CI
+TAG = latest
+endif
 
 DOCKER_BUILD_OPTS ?=
 
 build:
-	docker compose build shelf_api
+	@docker compose build shelf_api
 
 up: build
-	docker compose up -d
+	@docker compose up -d
 
 down:
-	docker compose down
+	@docker compose down
 
 test:
-	docker compose build --no-cache shelf_tests
-	docker compose run --rm shelf_tests
+	@docker compose build --no-cache shelf_tests
+	@docker compose run --rm shelf_tests
 
 lint:
-	poetry run poe lint
+	@poetry run poe lint
 
 format-check:
-	poetry run poe format-check
+	@poetry run poe format-check
 
 check: lint format-check
 
 push:
-	docker push $(IMAGE_NAME):$(TAG)
+	@docker push $(IMAGE_NAME):$(TAG)
