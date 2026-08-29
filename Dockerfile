@@ -89,3 +89,5 @@ COPY --from=production /usr/local /usr/local
 COPY --from=production /app /app
 
 ENV PYTHONPATH=/app/src
+
+CMD ["uvicorn", "shelf.app.main:app", "--host", "0.0.0.0", "--port", "8082"]
