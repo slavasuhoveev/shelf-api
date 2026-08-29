@@ -10,7 +10,7 @@
 
 .EXPORT_ALL_VARIABLES:
 
-PROJECT_NAME := shelf
+PROJECT_NAME := shelf-api
 
 REGISTRY ?= ghcr.io
 IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/$(PROJECT_NAME)
@@ -18,14 +18,16 @@ IMAGE_NAME ?= $(REGISTRY)/slavasuhoveev/$(PROJECT_NAME)
 # Default local tag
 TAG ?= develop
 
-ifdef CI
-TAG = latest
-endif
-
 DOCKER_BUILD_OPTS ?=
 
 build:
 	@docker compose build shelf_api
+
+build-prod:
+	@docker build \
+		--target final \
+		-t $(IMAGE_NAME):$(TAG) \
+		.
 
 up: build
 	@docker compose up -d
