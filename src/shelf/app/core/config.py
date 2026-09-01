@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     # Database configuration
     # ----------------------------
     POSTGRES_USER: str = 'shelf_user'
-    POSTGRES_PASSWORD: str = 'shelf'
+    POSTGRES_PASSWORD: str
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: str = 'shelf_db'
@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     JWT_ISSUER: str
     JWT_AUDIENCE: str
     JWKS_CACHE_TTL_SECONDS: int = 300
+
+    # ----------------------------
+    # Routing
+    # ----------------------------
+    CORS_ORIGINS: str = 'http://localhost:3000'
 
     # ----------------------------
     # Build computed database URL

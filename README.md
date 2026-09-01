@@ -90,18 +90,6 @@ POST /storage_group/       # Create new group
 
 ---
 
-## 🌐 Environment Variables
-
-```env
-POSTGRES_USER=shelf_user
-POSTGRES_PASSWORD=shelf
-POSTGRES_DB=shelf_db
-POSTGRES_HOST=postgresql
-POSTGRES_PORT=5432
-```
-
----
-
 ## ✅ Tasks
 
 All development commands are managed with **Poe the Poet**:
