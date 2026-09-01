@@ -7,9 +7,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from shelf.app.routers.system import system_group_router
-
+from shelf.app.core.config import settings
 from shelf.app.routers.user import user_router
-
 from shelf.app.routers.record import (
     album_work_router,
     release_router,
@@ -27,7 +26,7 @@ app = FastAPI()
 # Configure CORS middleware to allow requests from the frontend application
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:3000'],
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(',') if origin.strip()],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
